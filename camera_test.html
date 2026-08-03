@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body>
+<h2>Camera Test</h2>
+<video id="video" autoplay playsinline style="width:100%;max-width:400px;background:#000;"></video>
+<button id="start">Start Camera</button>
+<p id="status">Ready</p>
+<script>
+document.getElementById('start').onclick = async function() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        document.getElementById('video').srcObject = stream;
+        document.getElementById('status').textContent = '✅ Camera working!';
+    } catch(e) {
+        document.getElementById('status').textContent = '❌ Error: ' + e.message;
+    }
+};
+</script>
+</body>
+</html>

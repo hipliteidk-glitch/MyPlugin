@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Image Viewer</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: #0a0a1a;
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background: linear-gradient(135deg, #1a1a3e, #0d0d2b);
+            padding: 16px 20px;
+            border-bottom: 1px solid #2a2a5a;
+            flex-shrink: 0;
+        }
+        .header h1 {
+            font-size: 20px;
+            font-weight: 600;
+            background: linear-gradient(90deg, #ff6b6b, #ffd93d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .header p {
+            font-size: 13px;
+            color: #888;
+            margin-top: 4px;
+            -webkit-text-fill-color: #888;
+        }
+        .controls {
+            padding: 12px 16px;
+            background: #111128;
+            border-bottom: 1px solid #2a2a5a;
+            flex-shrink: 0;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .controls input {
+            flex: 1;
+            min-width: 150px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid #2a2a5a;
+            background: #1a1a3e;
+            color: #fff;
+            font-size: 15px;
+            outline: none;
+        }
+        .controls input:focus {
+            border-color: #ff6b6b;
+        }
+        .controls input::placeholder {
+            color: #666;
+        }
+        .controls .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .controls .btn-load {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: #fff;
+        }
+        .controls .btn-load:active { transform: scale(0.95); }
+        .controls .btn-clear {
+            background: #2a2a5a;
+            color: #aaa;
+        }
+        .controls .btn-clear:active { transform: scale(0.95); }
+        .image-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: radial-gradient(ellipse at center, #111128, #0a0a1a);
+            overflow: hidden;
+            position: relative;
+        }
+        .image-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+            display: none;
+        }
+        .image-container .placeholder {
+            color: #444;
+            font-size: 18px;
+            text-align: center;
+            line-height: 1.6;
+        }
+        .image-container .placeholder .icon {
+            font-size: 64px;
+            display: block;
+            margin-bottom: 16px;
+        }
+        .image-container .placeholder .sub {
+            font-size: 14px;
+            color: #333;
+        }
+        .status-bar {
+            padding: 10px 16px;
+            background: #0d0d1a;
+            border-top: 1px solid #1a1a3e;
+            font-size: 12px;
+            color: #555;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+        .status-bar .path {
+            color: #8be9fd;
+            font-family: monospace;
+            word-break: break-all;
+        }
+        .status-bar .hint {
+            color: #444;
+        }
+        .code-hint {
+            padding: 8px 16px;
+            background: #0d0d1a;
+            font-size: 12px;
+            color: #555;
+            border-top: 1px solid #1a1a3e;
+            flex-shrink: 0;
+            text-align: center;
+        }
+        .code-hint code {
+            color: #8be9fd;
+            background: #1a1a3e;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+        @media (max-width: 480px) {
+            .controls input { font-size: 14px; padding: 10px 12px; }
+            .controls .btn { padding: 10px 14px; font-size: 14px; }
+            .header h1 { font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🖼️ Image Viewer</h1>
+        <p>Load any image from your phone storage</p>
+    </div>
+    <div class="controls">
+        <input type="text" id="imagePath" placeholder="/sdcard/photo.jpg" spellcheck="false">
+        <button class="btn btn-load" onclick="loadImage()">📂 Load</button>
+        <button class="btn btn-clear" onclick="clearImage()">✕ Clear</button>
+    </div>
+    <div class="image-container" id="imageContainer">
+        <div class="placeholder" id="placeholder">
+            <span class="icon">🖼️</span>
+            No image loaded<br>
+            <span class="sub">Enter a path above and tap Load</span>
+        </div>
+        <img id="imageDisplay" alt="Image">
+    </div>
+    <div class="status-bar">
+        <span class="path" id="pathDisplay">📁 No image</span>
+        <span class="hint" id="hintDisplay">Tap Load to view</span>
+    </div>
+    <div class="code-hint">
+        💡 To change image in code: <code>document.getElementById('imagePath').value = '/sdcard/new.jpg'</code> then <code>loadImage()</code>
+    </div>
+    <script>
+        function loadImage() {
+            const input = document.getElementById('imagePath');
+            const path = input.value.trim();
+            if (!path) {
+                alert('Please enter an image path (e.g., /sdcard/photo.jpg)');
+                return;
+            }
+            const img = document.getElementById('imageDisplay');
+            const placeholder = document.getElementById('placeholder');
+            const pathDisplay = document.getElementById('pathDisplay');
+            const hintDisplay = document.getElementById('hintDisplay');
+            
+            const fileUrl = 'file://' + path;
+            img.src = fileUrl;
+            img.onload = function() {
+                img.style.display = 'block';
+                placeholder.style.display = 'none';
+                pathDisplay.textContent = '📁 ' + path;
+                hintDisplay.textContent = '✅ Image loaded';
+                hintDisplay.style.color = '#4caf50';
+            };
+            img.onerror = function() {
+                img.style.display = 'none';
+                placeholder.style.display = 'block';
+                pathDisplay.textContent = '❌ File not found: ' + path;
+                hintDisplay.textContent = '⚠️ Check the path';
+                hintDisplay.style.color = '#ff6b6b';
+                alert('Could not load image. Check that the path exists and is readable.\n\nExample paths:\n/sdcard/DCIM/Camera/photo.jpg\n/storage/emulated/0/Pictures/image.png');
+            };
+        }
+        function clearImage() {
+            const img = document.getElementById('imageDisplay');
+            const placeholder = document.getElementById('placeholder');
+            const pathDisplay = document.getElementById('pathDisplay');
+            const hintDisplay = document.getElementById('hintDisplay');
+            const input = document.getElementById('imagePath');
+            img.src = '';
+            img.style.display = 'none';
+            placeholder.style.display = 'block';
+            pathDisplay.textContent = '📁 No image';
+            hintDisplay.textContent = 'Tap Load to view';
+            hintDisplay.style.color = '#555';
+            input.value = '';
+        }
+        document.getElementById('imagePath').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') loadImage();
+        });
+        window.onload = function() {
+            document.getElementById('hintDisplay').textContent = '📱 Ready - enter image path';
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+Based on the Railway agent directory page, here are the key AI coding agents you can deploy and their primary features.
+
+### 🤖 Featured AI Agents
+| Agent | Developer | Key Features | Integration Type |
+| :--- | :--- | :--- | :--- |
+| **Grok Build** | xAI | Terminal coding agent with Plan Mode, parallel subagents, native MCP, web/X search, and `/goal` support. | Terminal, Standalone |
+| **Claude Code** | Anthropic | Agentic terminal agent that understands your codebase, runs commands, edits files, and handles Git operations. | IDE, Terminal, Standalone |
+| **Codex** | OpenAI | Lightweight terminal agent for reading/writing files, executing commands, and web browsing in a sandboxed environment. | IDE, Terminal, Standalone |
+| **Cursor** | Cursor | AI-first code editor with a Composer mode for multi-file edits and background agents with codebase indexing. | IDE, Terminal, Extension |
+| **OpenCode** | Anomaly | Open-source terminal agent supporting 75+ LLMs, featuring a rich TUI, built-in agents (build/plan), and LSP integration. | IDE, Terminal, Standalone |
+| **GitHub Copilot** | GitHub | AI pair programmer with an agent mode and workspace context, including CLI integration and PR summaries. | IDE, Terminal, Extension |
+| **Pi** | Earendil | Minimal, extensible open-source terminal agent with support for 15+ LLM providers, extensions, skills, and themes. | Terminal, Standalone |
+| **Devin** | Cognition | Autonomous AI software engineer that can plan, code, debug, and deploy independently for long-running tasks. | Cloud, Standalone |
+
+### 🚀 Why Railway for AI Agents?
+The page highlights that Railway is built to support these agents with infrastructure that scales:
+*   **Instant Scaling:** Scale from zero to thousands of instances, paying only for the compute you use.
+*   **Persistent State:** Built-in Redis, Postgres, and Volumes for long-term storage and retrieval.
+*   **Secure Execution:** Isolated environments, encrypted secrets, private networking, and SOC 2 compliance.
+*   **CLI & MCP Access:** Full programmatic control via CLI and MCP server for terminal-based deployment.
+*   **One-Click Templates:** Deploy full stacks with Postgres, Redis, MongoDB, and thousands of ready-to-use templates.
+*   **Real-Time Observability:** Live logs, metrics, and traces for complete visibility into agent behavior.
+*   **Instant Rollbacks:** Every deployment is versioned for easy rollbacks.
+*   **Team Collaboration:** Shared projects, role-based access, and audit logs for team shipping.
+
+### 🔍 How to Get Started
+The page provides a simple starting point:
+1.  **Deploy with one command:** Use `$ curl -fsSL agents.railway.com | sh` in your terminal.
+2.  **Compare Agents:** Use the "Compare agents" feature on the page to find the right fit for your workflow.
+3.  **Test the MCP Server:** Railway's Remote MCP Server is available for testing; learn more in their documentation.
+
+If you would like more detail on a specific agent or Railway's features, feel free to ask

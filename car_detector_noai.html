@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@latest"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Car Detector - Safe to Go?</title>
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkNhciBEZXRlY3RvciIsCiAgInNob3J0X25hbWUiOiAiQ2FyRGV0ZWN0IiwKICAiZGVzY3JpcHRpb24iOiAiVGVsbHMgaWYgeW91IGNhbiBnbyBieSBkZXRlY3RpbmcgY2FycyB3aXRoIGNhbWVyYSIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMGEwYTBhIiwKICAidGhlbWVfY29sb3IiOiAiIzRjYWY1MCIsCiAgImljb25zIjogW3sKICAgICJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sLDxzdmcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJyB2aWV3Qm94PScwIDAgMTAwIDEwMCc+PHJlY3Qgd2lkdGg9JzEwMCcgaGVpZ2h0PScxMDAnIHJ4PScyMCcgZmlsbD0nIzBhMGEwYScvPjx0ZXh0IHg9JzUwJyB5PSc2NScgZm9udC1zaXplPSc1MCcgdGV4dC1hbmNob3I9J21pZGRsZScgZmlsbD0nIzRjYWY1MCcgZm9udC1mYW1pbHk9J3NhbnMtc2VyaWYnPvCfjI08L3RleHQ+PC9zdmc+",CiAgICAic2l6ZXMiOiAiNTEyeDUxMiIsCiAgICAidHlwZSI6ICJpbWFnZS9zdmcreG1sIgogIH1dCn0=">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            touch-action: none;
+        }
+        #container {
+            width: 100%;
+            max-width: 480px;
+            padding: 16px;
+            text-align: center;
+        }
+        #video-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4/3;
+            background: #1a1a1a;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.8);
+        }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+        #overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        #status-badge {
+            position: absolute;
+            top: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 6px 18px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #aaa;
+        }
+        #result-box {
+            position: absolute;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 92%;
+            padding: 14px 18px;
+            border-radius: 16px;
+            font-size: 22px;
+            font-weight: 800;
+            text-align: center;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(12px);
+            border: 2px solid rgba(255,255,255,0.15);
+            transition: all 0.3s ease;
+        }
+        #result-box.safe { border-color: #4caf50; color: #4caf50; box-shadow: 0 0 40px rgba(76,175,80,0.2); }
+        #result-box.unsafe { border-color: #f44336; color: #f44336; box-shadow: 0 0 40px rgba(244,67,54,0.2); }
+        #result-box.waiting { border-color: #ffa726; color: #ffa726; }
+        #confidence {
+            font-size: 12px;
+            font-weight: 400;
+            opacity: 0.7;
+            margin-top: 4px;
+        }
+        #controls {
+            margin-top: 16px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #2a2a2a;
+            color: #fff;
+            flex: 1;
+            min-width: 80px;
+            border: 1px solid rgba(255,255,255,0.08);
+            touch-action: manipulation;
+        }
+        button:active { transform: scale(0.95); }
+        #btn-start { background: #4caf50; color: #fff; border-color: #4caf50; }
+        #btn-start:active { background: #388e3c; }
+        #btn-stop { background: #f44336; color: #fff; border-color: #f44336; }
+        #btn-stop:active { background: #c62828; }
+        #status-text {
+            margin-top: 10px;
+            font-size: 12px;
+            opacity: 0.5;
+            color: #aaa;
+        }
+        #install-banner {
+            margin-top: 12px;
+            padding: 8px 16px;
+            background: rgba(76,175,80,0.15);
+            border: 1px solid rgba(76,175,80,0.3);
+            border-radius: 30px;
+            font-size: 12px;
+            color: #4caf50;
+            display: none;
+        }
+        #install-banner.show { display: inline-block; }
+        @media (max-width: 480px) {
+            #result-box { font-size: 18px; padding: 12px 14px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="video-wrapper">
+            <video id="video" autoplay playsinline></video>
+            <canvas id="canvas" style="display:none;"></canvas>
+            <div id="overlay">
+                <div id="status-badge">📷 CAMERA</div>
+                <div id="result-box" class="waiting">
+                    <span id="result-text">⬇️ Point at road</span>
+                    <div id="confidence">Tap Start</div>
+                </div>
+            </div>
+        
+    <div id="learn-panel" style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,0.95); padding:24px; border-radius:16px; z-index:1000; width:90%; max-width:400px; text-align:center; border:2px solid #ffa726;"> position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,0.9); padding:20px; border-radius:16px; z-index:100; width:90%; max-width:400px; text-align:center;">
+        <h3 style="color:#fff; margin-bottom:12px;">🧠 Teach the Detector</h3>
+        <p style="color:#aaa; font-size:14px; margin-bottom:16px;">Is there a car in this frame?</p>
+        <div style="display:flex; gap:12px; justify-content:center;">
+            <button id="learn-yes" style="background:#4caf50; color:#fff; border:none; padding:12px 30px; border-radius:30px; font-weight:700; font-size:16px;">✅ Yes, Car</button>
+            <button id="learn-no" style="background:#f44336; color:#fff; border:none; padding:12px 30px; border-radius:30px; font-weight:700; font-size:16px;">❌ No Car</button>
+        </div>
+        <button id="learn-close" style="margin-top:16px; background:#333; color:#fff; border:none; padding:8px 20px; border-radius:20px; font-size:12px;">Close</button>
+        <div id="learn-stats" style="color:#888; font-size:12px; margin-top:12px;"></div>
+    </div>
+</div>
+        <div id="controls">
+            <button id="btn-start">▶ Start</button>
+            <button id="btn-stop">⏹ Stop</button>
+    <button id="btn-night" style="background:#3f51b5; color:#fff; border-color:#3f51b5;">🌙 Night</button>
+    <button id="btn-ai" style="background:#9c27b0; color:#fff; border-color:#9c27b0;">🤖 AI</button>
+
+        </div>
+        
+    <div id="stats" style="margin-top:10px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; font-size:12px; color:#aaa;">
+        <span id="stat-cars">🚗 Cars: 0</span>
+        <span id="stat-distance">📏 Distance: --</span>
+        <span id="stat-mode">🌞 Day</span>
+    </div>
+<div id="status-text">📡 No uploads — runs entirely on your device</div>
+        <div id="install-banner">📲 Add to home screen for full app experience</div>
+    </div>
+    <script>
+        (function() {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            const resultText = document.getElementById('result-text');
+            const confidenceEl = document.getElementById('confidence');
+            const resultBox = document.getElementById('result-box');
+            const statusBadge = document.getElementById('status-badge');
+            const statusText = document.getElementById('status-text');
+            const installBanner = document.getElementById('install-banner');
+
+            let stream = null;
+            let animationId = null;
+            let running = false;
+
+            // Show install banner if PWA available
+            if (window.navigator.standalone === true) {
+                installBanner.classList.remove('show');
+            } else if (window.matchMedia('(display-mode: standalone)').matches) {
+                installBanner.classList.remove('show');
+            } else if (stable === 'waiting') {
+                // Check if beforeinstallprompt fired (Chrome)
+                installBanner.classList.add('show');
+            }
+
+            function detectCar(imageData) {
+                const data = imageData.data;
+                const w = imageData.width;
+                const h = imageData.height;
+                const step = 8;
+                let darkPixels = 0, brightPixels = 0, redPixels = 0, bluePixels = 0, edgePixels = 0;
+                const startY = Math.floor(h * 0.4);
+                const endY = h;
+                let sampled = 0;
+
+                for (let y = startY; y < endY; y += step) {
+                    for (let x = 0; x < w; x += step) {
+                        sampled++;
+                        const idx = (y * w + x) * 4;
+                        const r = data[idx], g = data[idx+1], b = data[idx+2];
+                        const brightness = (r + g + b) / 3;
+                        if (brightness < 80) darkPixels++;
+                        if (brightness > 200) brightPixels++;
+                        if (r > 150 && g < 100 && b < 100) redPixels++;
+                        if (b > 150 && r < 100 && g < 100) bluePixels++;
+                        if (x + step < w && y + step < h) {
+                            const idx2 = ((y + step) * w + (x + step)) * 4;
+                            const b2 = (data[idx2] + data[idx2+1] + data[idx2+2]) / 3;
+                            if (Math.abs(brightness - b2) > 60) edgePixels++;
+                        }
+                    }
+                }
+                if (sampled === 0) return { result: 'waiting', confidence: 0 };
+
+                const darkRatio = darkPixels / sampled;
+                const brightRatio = brightPixels / sampled;
+                const redRatio = redPixels / sampled;
+                const blueRatio = bluePixels / sampled;
+                const edgeRatio = edgePixels / sampled;
+
+                let score = 0;
+                if (darkRatio > 0.08) score += 25;
+                if (darkRatio > 0.15) score += 20;
+                if (darkRatio > 0.25) score += 15;
+                if (brightRatio > 0.05) score += 10;
+                if (brightRatio > 0.12) score += 15;
+                if (redRatio > 0.02) score += 20;
+                if (redRatio > 0.06) score += 15;
+                if (blueRatio > 0.02) score += 10;
+                if (edgeRatio > 0.05) score += 10;
+                if (edgeRatio > 0.12) score += 10;
+
+                let confidence = Math.min(100, Math.round(score * 0.85));
+                if (darkRatio > 0.1 && brightRatio > 0.05) confidence += 10;
+                if (darkRatio < 0.02 && brightRatio < 0.02 && redRatio < 0.01 && blueRatio < 0.01) {
+                    confidence = Math.max(0, confidence - 30);
+                }
+                if (darkRatio > 0.2) confidence += 10;
+                confidence = Math.min(100, Math.max(0, confidence));
+
+                let result = 'waiting';
+                if (confidence > 72) result = 'unsafe';
+                else if (confidence > 25) result = 'waiting';
+                else result = 'safe';
+
+                return { result, confidence, darkRatio, brightRatio, redRatio, edgeRatio };
+            }
+
+            function processFrame() {
+                if (!running) return;
+                const w = video.videoWidth, h = video.videoHeight;
+                if (w === 0 || h === 0) { animationId = requestAnimationFrame(processFrame); return; }
+                canvas.width = w; canvas.height = h;
+                ctx.drawImage(video, 0, 0, w, h);
+                const imageData = ctx.getImageData(0, 0, w, h);
+                const { result, confidence, darkRatio, brightRatio, redRatio } = detectCar(imageData);
+
+                if (result === 'safe') {
+                    resultText.textContent = '✅ SAFE — GO!';
+                    resultBox.className = 'safe';
+                    statusBadge.textContent = '🟢 CLEAR';
+                } else if (result === 'unsafe') {
+                    resultText.textContent = '🚫 CAR — WAIT!';
+                    resultBox.className = 'unsafe';
+                    statusBadge.textContent = '🔴 CAR';
+                } else if (stable === 'waiting') {
+                    resultText.textContent = '⏳ CHECKING...';
+                    resultBox.className = 'waiting';
+                    statusBadge.textContent = '🟡 ANALYZING';
+                }
+                let detail = `Conf: ${confidence}%`;
+                if (darkRatio !== undefined) detail += ` | Dark: ${(darkRatio*100).toFixed(0)}%`;
+                if (brightRatio !== undefined) detail += ` | Bright: ${(brightRatio*100).toFixed(0)}%`;
+                if (redRatio !== undefined) detail += ` | Red: ${(redRatio*100).toFixed(0)}%`;
+                confidenceEl.textContent = detail;
+                animationId = requestAnimationFrame(processFrame);
+            }
+
+            async function startCamera() {
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } },
+                        audio: false
+                    });
+                    video.srcObject = stream;
+                    await video.play();
+                    running = true;
+                    statusText.textContent = '📡 Live — point at road';
+                    processFrame();
+                } catch (err) {
+                    statusText.textContent = '❌ Camera error: ' + err.message;
+                    running = false;
+                }
+            }
+
+            function stopCamera() {
+                running = false;
+                if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
+                if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+                video.srcObject = null;
+                statusText.textContent = '⏹ Stopped';
+                resultText.textContent = '⏸ Camera off';
+                resultBox.className = 'waiting';
+                statusBadge.textContent = '📷 OFF';
+                confidenceEl.textContent = 'Tap Start';
+            }
+
+            document.getElementById('btn-start').addEventListener('click', () => {
+                if (running) stopCamera();
+                startCamera();
+            });
+            document.getElementById('btn-stop').addEventListener('click', stopCamera);
+
+            // PWA: beforeinstallprompt
+            let deferredPrompt;
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                installBanner.classList.add('show');
+                installBanner.textContent = '📲 Tap to install as app';
+                installBanner.style.cursor = 'pointer';
+                installBanner.onclick = async () => {
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt();
+                        const result = await deferredPrompt.userChoice;
+                        if (result.outcome === 'accepted') {
+                            installBanner.classList.remove('show');
+                        }
+                        deferredPrompt = null;
+                    }
+                };
+            });
+            window.addEventListener('appinstalled', () => {
+                installBanner.classList.remove('show');
+            });
+
+            
+    // ===== FEATURE: Car Counting with Connected Components =====
+    function countCarsWithComponents(imageData) {
+        const data = imageData.data;
+        const w = imageData.width;
+        const h = imageData.height;
+        
+        // Create a binary mask of car-like regions
+        const mask = new Uint8Array(w * h);
+        const step = 4;
+        let carPixels = 0;
+        
+        for (let y = 0; y < h; y += step) {
+            for (let x = 0; x < w; x += step) {
+                const idx = (y * w + x) * 4;
+                const r = data[idx], g = data[idx+1], b = data[idx+2];
+                const brightness = (r + g + b) / 3;
+                // Car-like: dark or red/blue tail/headlights
+                const isCarPixel = (brightness < 80) || (r > 150 && g < 100 && b < 100) || (b > 150 && r < 100 && g < 100);
+                if (isCarPixel) {
+                    mask[y * w + x] = 1;
+                    carPixels++;
+                }
+            }
+        }
+        
+        // Connected component labeling (BFS)
+        const visited = new Uint8Array(w * h);
+        const components = [];
+        const minComponentSize = 20;
+        
+        for (let y = 0; y < h; y++) {
+            for (let x = 0; x < w; x++) {
+                if (mask[y * w + x] === 1 && visited[y * w + x] === 0) {
+                    // BFS flood fill
+                    const queue = [{x, y}];
+                    visited[y * w + x] = 1;
+                    let size = 0;
+                    let minX = x, maxX = x, minY = y, maxY = y;
+                    
+                    while (queue.length > 0) {
+                        const p = queue.shift();
+                        size++;
+                        if (p.x < minX) minX = p.x;
+                        if (p.x > maxX) maxX = p.x;
+                        if (p.y < minY) minY = p.y;
+                        if (p.y > maxY) maxY = p.y;
+                        
+                        const neighbors = [{x:p.x-1,y:p.y},{x:p.x+1,y:p.y},{x:p.x,y:p.y-1},{x:p.x,y:p.y+1}];
+                        for (const n of neighbors) {
+                            if (n.x >= 0 && n.x < w && n.y >= 0 && n.y < h && mask[n.y * w + n.x] === 1 && visited[n.y * w + n.x] === 0) {
+                                visited[n.y * w + n.x] = 1;
+                                queue.push(n);
+                            }
+                        }
+                    }
+                    
+                    if (size > minComponentSize) {
+                        components.push({
+                            size,
+                            bbox: {x: minX, y: minY, width: maxX - minX, height: maxY - minY},
+                            centerX: (minX + maxX) / 2,
+                            centerY: (minY + maxY) / 2
+                        });
+                    }
+                }
+            }
+        }
+        
+        return components;
+    }
+    
+    // ===== FEATURE: Distance Estimation =====
+    function estimateDistance(bbox, videoWidth, videoHeight) {
+        // Assume a typical car width is 1.8 meters, and we know the camera FOV
+        const carWidthMeters = 1.8;
+        const fov = 60; // degrees, typical for phone cameras
+        const fovRad = fov * Math.PI / 180;
+        
+        // Calculate the car's width as a fraction of the frame
+        const widthFraction = bbox.width / videoWidth;
+        
+        // Distance = (carWidth / 2) / tan(fov/2 * widthFraction)
+        // Simplified: distance ≈ carWidth / (2 * tan(fov/2 * widthFraction))
+        if (widthFraction < 0.01) return null;
+        
+        const distance = carWidthMeters / (2 * Math.tan((fovRad * widthFraction) / 2));
+        return distance;
+    }
+    
+    // ===== FEATURE: Night Mode =====
+    let nightMode = false;
+    
+    function detectHeadlights(imageData) {
+        const data = imageData.data;
+        const w = imageData.width;
+        const h = imageData.height;
+        const headlights = [];
+        const step = 6;
+        
+        for (let y = 0; y < h; y += step) {
+            for (let x = 0; x < w; x += step) {
+                const idx = (y * w + x) * 4;
+                const r = data[idx], g = data[idx+1], b = data[idx+2];
+                const brightness = (r + g + b) / 3;
+                
+                // Headlight: very bright (high brightness) and white-ish (R,G,B all high and close)
+                if (brightness > 200 && r > 150 && g > 150 && b > 150) {
+                    headlights.push({x, y, brightness});
+                }
+            }
+        }
+        
+        // Cluster nearby headlights
+        const clusters = [];
+        const used = new Array(headlights.length).fill(false);
+        for (let i = 0; i < headlights.length; i++) {
+            if (used[i]) continue;
+            const cluster = [headlights[i]];
+            used[i] = true;
+            for (let j = i + 1; j < headlights.length; j++) {
+                if (used[j]) continue;
+                const dx = headlights[i].x - headlights[j].x;
+                const dy = headlights[i].y - headlights[j].y;
+                if (Math.sqrt(dx*dx + dy*dy) < 50) {
+                    cluster.push(headlights[j]);
+                    used[j] = true;
+                }
+            }
+            if (cluster.length > 5) {
+                clusters.push(cluster);
+            }
+        }
+        
+        return clusters;
+    }
+    
+    // ===== FEATURE: TensorFlow.js AI Mode =====
+    let aiModel = null;
+    let aiMode = false;
+    let aiReady = false;
+    
+    async function loadAIModel() {
+        try {
+            document.getElementById('status-text').textContent = '🤖 Loading AI model...';
+            aiModel = await cocoSsd.load();
+            aiReady = true;
+            document.getElementById('status-text').textContent = '✅ AI model ready!';
+            setTimeout(() => {
+                if (running) document.getElementById('status-text').textContent = '📡 Live — point at road';
+            }, 2000);
+        } catch(e) {
+            console.error('AI load error:', e);
+            document.getElementById('status-text').textContent = '❌ AI load failed: ' + e.message;
+            aiReady = false;
+        }
+    }
+    
+    async function detectWithAI(imageData) {
+        if (!aiModel || !aiReady) return null;
+        try {
+            const canvas2 = document.createElement('canvas');
+            canvas2.width = imageData.width;
+            canvas2.height = imageData.height;
+            const ctx2 = canvas2.getContext('2d');
+            ctx2.putImageData(imageData, 0, 0);
+            const predictions = await aiModel.detect(canvas2);
+            return predictions.filter(p => p.class === 'car' || p.class === 'truck' || p.class === 'bus');
+        } catch(e) {
+            return null;
+        }
+    }
+    
+    // Toggle night mode
+    document.getElementById('btn-night').addEventListener('click', function() {
+        nightMode = !nightMode;
+        this.textContent = nightMode ? '☀️ Day' : '🌙 Night';
+        this.style.background = nightMode ? '#ff9800' : '#3f51b5';
+        document.getElementById('stat-mode').textContent = nightMode ? '🌙 Night' : '🌞 Day';
+    });
+    
+    // Toggle AI mode
+    document.getElementById('btn-ai').addEventListener('click', function() {
+        aiMode = !aiMode;
+        this.textContent = aiMode ? '🧠 AI On' : '🤖 AI';
+        this.style.background = aiMode ? '#4caf50' : '#9c27b0';
+        if (aiMode && !aiReady) {
+            loadAIModel();
+        }
+    });
+    
+    // Load AI on startup
+    setTimeout(loadAIModel, 2000);
+    
+    // ===== OVERRIDE: Enhanced detection with all features =====
+    const originalProcessFrame = processFrame;
+    
+    processFrame = function() {
+        if (!running) return;
+        const w = video.videoWidth, h = video.videoHeight;
+        if (w === 0 || h === 0) { animationId = requestAnimationFrame(processFrame); return; }
+        canvas.width = w; canvas.height = h;
+        ctx.drawImage(video, 0, 0, w, h);
+        const imageData = ctx.getImageData(0, 0, w, h);
+        
+        // If AI mode is enabled and ready, use AI detection
+        if (aiMode && aiReady) {
+            detectWithAI(imageData).then(predictions => {
+                if (predictions && predictions.length > 0) {
+                    const car = predictions[0];
+                    const bbox = car.bbox;
+                    const distance = estimateDistance(
+                        {x: bbox[0], y: bbox[1], width: bbox[2], height: bbox[3]},
+                        w, h
+                    );
+                    
+                    // Update UI
+                    document.getElementById('stat-cars').textContent = `🚗 Cars: ${predictions.length}`;
+                    document.getElementById('stat-distance').textContent = distance ? `📏 ${distance.toFixed(1)}m` : '📏 --';
+                    document.getElementById('stat-mode').textContent = nightMode ? '🌙 Night' : '🌞 Day';
+                    
+                    const stable = getStableResult(predictions.length > 0 ? 'unsafe' : 'safe');
+                    if (predictions.length > 0) {
+                        resultText.textContent = `🚫 ${predictions.length} CAR${predictions.length > 1 ? 'S' : ''} — WAIT!`;
+                        resultBox.className = 'unsafe';
+                        statusBadge.textContent = `🔴 ${predictions.length} CAR`;
+                    } else if (stable === 'waiting') {
+                        resultText.textContent = '✅ SAFE — GO!';
+                        resultBox.className = 'safe';
+                        statusBadge.textContent = '🟢 CLEAR';
+                    }
+                } else if (stable === 'waiting') {
+                    resultText.textContent = '✅ SAFE — GO!';
+                    resultBox.className = 'safe';
+                    statusBadge.textContent = '🟢 CLEAR';
+                    document.getElementById('stat-cars').textContent = '🚗 Cars: 0';
+                    document.getElementById('stat-distance').textContent = '📏 Distance: --';
+                }
+                animationId = requestAnimationFrame(processFrame);
+            });
+            return;
+        }
+        
+        // Fallback to heuristic detection
+        const { result, confidence, darkRatio, brightRatio, redRatio } = detectCar(imageData);
+        
+        // Car counting using connected components
+        const components = countCarsWithComponents(imageData);
+        const carCount = components.length;
+        document.getElementById('stat-cars').textContent = `🚗 Cars: ${carCount}`;
+        
+        // Distance estimation
+        let distance = null;
+        let totalDistance = 0;
+        let validComponents = 0;
+        for (const comp of components) {
+            const d = estimateDistance(comp.bbox, w, h);
+            if (d !== null && d < 100) {
+                totalDistance += d;
+                validComponents++;
+            }
+        }
+        if (validComponents > 0) {
+            distance = totalDistance / validComponents;
+            document.getElementById('stat-distance').textContent = `📏 ${distance.toFixed(1)}m`;
+        } else if (stable === 'waiting') {
+            document.getElementById('stat-distance').textContent = '📏 --';
+        }
+        
+        // Night mode: headlight detection
+        if (nightMode) {
+            const headlights = detectHeadlights(imageData);
+            if (headlights.length > 0) {
+                statusBadge.textContent = `💡 ${headlights.length} headlights`;
+                document.getElementById('stat-mode').textContent = '🌙 Night';
+                // If headlights detected and car count > 0, it's definitely unsafe
+                const stableNight = getStableResult((carCount > 0 || headlights.length > 1) ? 'unsafe' : 'safe');
+                if (stableNight === 'unsafe') {
+                    resultText.textContent = `🚫 ${Math.max(carCount, headlights.length)} lights — WAIT!`;
+                    resultBox.className = 'unsafe';
+                    statusBadge.textContent = `💡 HEADLIGHTS`;
+                }
+            }
+        }
+        
+        // Update UI based on detection result
+        const stable = getStableResult((result === 'safe' && carCount === 0) ? 'safe' : (result === 'unsafe' || carCount > 0) ? 'unsafe' : 'waiting');
+                if (stable === 'safe') {
+            resultText.textContent = '✅ SAFE — GO!';
+            resultBox.className = 'safe';
+            if (!nightMode) statusBadge.textContent = '🟢 CLEAR';
+        } else if (stable === 'unsafe') {
+            resultText.textContent = `🚫 ${Math.max(carCount, 1)} CAR${carCount > 1 ? 'S' : ''} — WAIT!`;
+            resultBox.className = 'unsafe';
+            if (!nightMode) statusBadge.textContent = `🔴 ${Math.max(carCount, 1)} CAR`;
+        } else if (stable === 'waiting') {
+            resultText.textContent = '⏳ CHECKING...';
+            resultBox.className = 'waiting';
+            if (!nightMode) statusBadge.textContent = '🟡 ANALYZING';
+        }
+        
+        let detail = `Conf: ${confidence}%`;
+        if (darkRatio !== undefined) detail += ` | Dark: ${(darkRatio*100).toFixed(0)}%`;
+        if (brightRatio !== undefined) detail += ` | Bright: ${(brightRatio*100).toFixed(0)}%`;
+        if (redRatio !== undefined) detail += ` | Red: ${(redRatio*100).toFixed(0)}%`;
+        detail += ` | Cars: ${carCount}`;
+        confidenceEl.textContent = detail;
+        
+        animationId = requestAnimationFrame(processFrame);
+    };
+// Initial state
+            resultText.textContent = '⬇️ Point at road';
+            confidenceEl.textContent = 'Tap Start';
+            statusBadge.textContent = '📷 READY';
+        })();
+    
+    // Learning Mode
+    let learningMode = false;
+    let learnSamples = { car: 0, noclear: 0 };
+    let learnThresholds = { dark: 80, bright: 200, redR: 150, redG: 100, redB: 100, blueB: 150, blueR: 100, blueG: 100 };
+    // ===== STABILITY FILTER (prevents blinking) =====
+    let stableResult = 'waiting';
+    let stableCount = 0;
+    let resultHistory = [];
+    const HISTORY_SIZE = 5;
+    const REQUIRED_CONSECUTIVE = 3;
+    
+    function getStableResult(newResult) {
+        // Add to history
+        resultHistory.push(newResult);
+        if (resultHistory.length > HISTORY_SIZE) {
+            resultHistory.shift();
+        }
+        
+        // Count occurrences
+        let counts = {};
+        for (let r of resultHistory) {
+            counts[r] = (counts[r] || 0) + 1;
+        }
+        
+        // Find the most common result
+        let maxCount = 0;
+        let mostCommon = 'waiting';
+        for (let r in counts) {
+            if (counts[r] > maxCount) {
+                maxCount = counts[r];
+                mostCommon = r;
+            }
+        }
+        
+        // Only change if we have enough confidence in the trend
+        if (maxCount >= REQUIRED_CONSECUTIVE) {
+            stableResult = mostCommon;
+        }
+        
+        return stableResult;
+    }
+
+    
+    // Load saved learning data
+    try {
+        const saved = localStorage.getItem('carDetectorLearning');
+        if (saved) {
+            const data = JSON.parse(saved);
+            learnSamples = data.samples || { car: 0, noclear: 0 };
+            learnThresholds = data.thresholds || learnThresholds;
+        }
+    } catch(e) {}
+    
+    function saveLearning() {
+        try {
+            localStorage.setItem('carDetectorLearning', JSON.stringify({
+                samples: learnSamples,
+                thresholds: learnThresholds
+            }));
+        } catch(e) {}
+    }
+    
+    function showLearnPanel() { console.log("Show learn panel called");
+        document.getElementById('learn-panel').style.display = 'block';
+        updateLearnStats();
+        // Pause detection
+        if (running) {
+            // We'll keep running but freeze the frame used for learning
+        }
+    }
+    
+    function updateLearnStats() {
+        const total = learnSamples.car + learnSamples.noclear;
+        document.getElementById('learn-stats').textContent = 
+            `📊 Learned: ${learnSamples.car} cars, ${learnSamples.noclear} non-cars | Total: ${total}`;
+    }
+    
+    function learnFromFrame(isCar) {
+        // Capture current frame data
+        const w = video.videoWidth, h = video.videoHeight;
+        if (w === 0 || h === 0) return;
+        canvas.width = w; canvas.height = h;
+        ctx.drawImage(video, 0, 0, w, h);
+        const imageData = ctx.getImageData(0, 0, w, h);
+        const data = imageData.data;
+        
+        // Analyze frame
+        const step = 8;
+        let darkPixels = 0, brightPixels = 0, redPixels = 0, bluePixels = 0;
+        const startY = Math.floor(h * 0.4);
+        const endY = h;
+        let sampled = 0;
+        
+        for (let y = startY; y < endY; y += step) {
+            for (let x = 0; x < w; x += step) {
+                sampled++;
+                const idx = (y * w + x) * 4;
+                const r = data[idx], g = data[idx+1], b = data[idx+2];
+                const brightness = (r + g + b) / 3;
+                if (brightness < 80) darkPixels++;
+                if (brightness > 200) brightPixels++;
+                if (r > 150 && g < 100 && b < 100) redPixels++;
+                if (b > 150 && r < 100 && g < 100) bluePixels++;
+            }
+        }
+        
+        const darkRatio = darkPixels / sampled;
+        const brightRatio = brightPixels / sampled;
+        const redRatio = redPixels / sampled;
+        const blueRatio = bluePixels / sampled;
+        
+        // Store as a sample
+        if (isCar) {
+            learnSamples.car++;
+            // Adjust thresholds based on this car sample
+            learnThresholds.dark = Math.max(60, Math.min(100, (learnThresholds.dark + darkRatio * 100) / 2));
+            learnThresholds.bright = Math.max(150, Math.min(250, (learnThresholds.bright + brightRatio * 100) / 2));
+        } else if (stable === 'waiting') {
+            learnSamples.noclear++;
+        }
+        
+        saveLearning();
+        updateLearnStats();
+        document.getElementById('learn-panel').style.display = 'none';
+        
+        // Show feedback
+        const feedback = isCar ? '✅ Learned: Car' : '❌ Learned: Not a car';
+        statusText.textContent = '🧠 ' + feedback + ' | Samples: ' + (learnSamples.car + learnSamples.noclear);
+        setTimeout(() => {
+            if (running) statusText.textContent = '📡 Live — point at road';
+        }, 2000);
+    }
+    
+    // Add learn button to controls
+    const controlsDiv = document.getElementById('controls');
+    const learnBtn = document.createElement('button');
+    learnBtn.id = 'btn-learn';
+    learnBtn.textContent = '🧠 Learn';
+    learnBtn.style.background = '#ffa726';
+    learnBtn.style.color = '#fff';
+    learnBtn.style.borderColor = '#ffa726';
+    learnBtn.onclick = function() {
+        if (!running) {
+            statusText.textContent = '⚠️ Start the camera first';
+            return;
+        }
+        showLearnPanel();
+    };
+    controlsDiv.appendChild(learnBtn);
+    
+    // Learn panel event listeners
+    document.getElementById('learn-yes').addEventListener('click', function() {
+        learnFromFrame(true);
+    });
+    document.getElementById('learn-no').addEventListener('click', function() {
+        learnFromFrame(false);
+    });
+    document.getElementById('learn-close').addEventListener('click', function() {
+        document.getElementById('learn-panel').style.display = 'none';
+    });
+    
+    // Override detectCar to use learned thresholds
+    const originalDetectCar = detectCar;
+    detectCar = function(imageData) {
+        const data = imageData.data;
+        const w = imageData.width;
+        const h = imageData.height;
+        const step = 8;
+        let darkPixels = 0, brightPixels = 0, redPixels = 0, bluePixels = 0, edgePixels = 0;
+        const startY = Math.floor(h * 0.4);
+        const endY = h;
+        let sampled = 0;
+        
+        const t = learnThresholds;
+        
+        for (let y = startY; y < endY; y += step) {
+            for (let x = 0; x < w; x += step) {
+                sampled++;
+                const idx = (y * w + x) * 4;
+                const r = data[idx], g = data[idx+1], b = data[idx+2];
+                const brightness = (r + g + b) / 3;
+                if (brightness < t.dark) darkPixels++;
+                if (brightness > t.bright) brightPixels++;
+                if (r > t.redR && g < t.redG && b < t.redB) redPixels++;
+                if (b > t.blueB && r < t.blueR && g < t.blueG) bluePixels++;
+                if (x + step < w && y + step < h) {
+                    const idx2 = ((y + step) * w + (x + step)) * 4;
+                    const b2 = (data[idx2] + data[idx2+1] + data[idx2+2]) / 3;
+                    if (Math.abs(brightness - b2) > 60) edgePixels++;
+                }
+            }
+        }
+        
+        if (sampled === 0) return { result: 'waiting', confidence: 0 };
+        
+        const darkRatio = darkPixels / sampled;
+        const brightRatio = brightPixels / sampled;
+        const redRatio = redPixels / sampled;
+        const blueRatio = bluePixels / sampled;
+        const edgeRatio = edgePixels / sampled;
+        
+        let score = 0;
+        if (darkRatio > 0.08) score += 25;
+        if (darkRatio > 0.15) score += 20;
+        if (darkRatio > 0.25) score += 15;
+        if (brightRatio > 0.05) score += 10;
+        if (brightRatio > 0.12) score += 15;
+        if (redRatio > 0.02) score += 20;
+        if (redRatio > 0.06) score += 15;
+        if (blueRatio > 0.02) score += 10;
+        if (edgeRatio > 0.05) score += 10;
+        if (edgeRatio > 0.12) score += 10;
+        
+        let confidence = Math.min(100, Math.round(score * 0.85));
+        if (darkRatio > 0.1 && brightRatio > 0.05) confidence += 10;
+        if (darkRatio < 0.02 && brightRatio < 0.02 && redRatio < 0.01 && blueRatio < 0.01) {
+            confidence = Math.max(0, confidence - 30);
+        }
+        if (darkRatio > 0.2) confidence += 10;
+        confidence = Math.min(100, Math.max(0, confidence));
+        
+        let result = 'waiting';
+        if (confidence > 72) result = 'unsafe';
+        else if (confidence > 25) result = 'waiting';
+        else result = 'safe';
+        
+        return { result, confidence, darkRatio, brightRatio, redRatio, edgeRatio };
+    };
+</script>
+<script src="https://pagedrop.ai/g/jalehman/3c031225cb70b73fe080f60f1b174cce">
+    // Learning Mode
+    let learningMode = false;
+    let learnSamples = { car: 0, noclear: 0 };
+    let learnThresholds = { dark: 80, bright: 200, redR: 150, redG: 100, redB: 100, blueB: 150, blueR: 100, blueG: 100 };
+    // ===== STABILITY FILTER (prevents blinking) =====
+    let stableResult = 'waiting';
+    let stableCount = 0;
+    let resultHistory = [];
+    const HISTORY_SIZE = 5;
+    const REQUIRED_CONSECUTIVE = 3;
+    
+    function getStableResult(newResult) {
+        // Add to history
+        resultHistory.push(newResult);
+        if (resultHistory.length > HISTORY_SIZE) {
+            resultHistory.shift();
+        }
+        
+        // Count occurrences
+        let counts = {};
+        for (let r of resultHistory) {
+            counts[r] = (counts[r] || 0) + 1;
+        }
+        
+        // Find the most common result
+        let maxCount = 0;
+        let mostCommon = 'waiting';
+        for (let r in counts) {
+            if (counts[r] > maxCount) {
+                maxCount = counts[r];
+                mostCommon = r;
+            }
+        }
+        
+        // Only change if we have enough confidence in the trend
+        if (maxCount >= REQUIRED_CONSECUTIVE) {
+            stableResult = mostCommon;
+        }
+        
+        return stableResult;
+    }
+
+    
+    // Load saved learning data
+    try {
+        const saved = localStorage.getItem('carDetectorLearning');
+        if (saved) {
+            const data = JSON.parse(saved);
+            learnSamples = data.samples || { car: 0, noclear: 0 };
+            learnThresholds = data.thresholds || learnThresholds;
+        }
+    } catch(e) {}
+    
+    function saveLearning() {
+        try {
+            localStorage.setItem('carDetectorLearning', JSON.stringify({
+                samples: learnSamples,
+                thresholds: learnThresholds
+            }));
+        } catch(e) {}
+    }
+    
+    function showLearnPanel() { console.log("Show learn panel called");
+        document.getElementById('learn-panel').style.display = 'block';
+        updateLearnStats();
+        // Pause detection
+        if (running) {
+            // We'll keep running but freeze the frame used for learning
+        }
+    }
+    
+    function updateLearnStats() {
+        const total = learnSamples.car + learnSamples.noclear;
+        document.getElementById('learn-stats').textContent = 
+            `📊 Learned: ${learnSamples.car} cars, ${learnSamples.noclear} non-cars | Total: ${total}`;
+    }
+    
+    function learnFromFrame(isCar) {
+        // Capture current frame data
+        const w = video.videoWidth, h = video.videoHeight;
+        if (w === 0 || h === 0) return;
+        canvas.width = w; canvas.height = h;
+        ctx.drawImage(video, 0, 0, w, h);
+        const imageData = ctx.getImageData(0, 0, w, h);
+        const data = imageData.data;
+        
+        // Analyze frame
+        const step = 8;
+        let darkPixels = 0, brightPixels = 0, redPixels = 0, bluePixels = 0;
+        const startY = Math.floor(h * 0.4);
+        const endY = h;
+        let sampled = 0;
+        
+        for (let y = startY; y < endY; y += step) {
+            for (let x = 0; x < w; x += step) {
+                sampled++;
+                const idx = (y * w + x) * 4;
+                const r = data[idx], g = data[idx+1], b = data[idx+2];
+                const brightness = (r + g + b) / 3;
+                if (brightness < 80) darkPixels++;
+                if (brightness > 200) brightPixels++;
+                if (r > 150 && g < 100 && b < 100) redPixels++;
+                if (b > 150 && r < 100 && g < 100) bluePixels++;
+            }
+        }
+        
+        const darkRatio = darkPixels / sampled;
+        const brightRatio = brightPixels / sampled;
+        const redRatio = redPixels / sampled;
+        const blueRatio = bluePixels / sampled;
+        
+        // Store as a sample
+        if (isCar) {
+            learnSamples.car++;
+            // Adjust thresholds based on this car sample
+            learnThresholds.dark = Math.max(60, Math.min(100, (learnThresholds.dark + darkRatio * 100) / 2));
+            learnThresholds.bright = Math.max(150, Math.min(250, (learnThresholds.bright + brightRatio * 100) / 2));
+        } else if (stable === 'waiting') {
+            learnSamples.noclear++;
+        }
+        
+        saveLearning();
+        updateLearnStats();
+        document.getElementById('learn-panel').style.display = 'none';
+        
+        // Show feedback
+        const feedback = isCar ? '✅ Learned: Car' : '❌ Learned: Not a car';
+        statusText.textContent = '🧠 ' + feedback + ' | Samples: ' + (learnSamples.car + learnSamples.noclear);
+        setTimeout(() => {
+            if (running) statusText.textContent = '📡 Live — point at road';
+        }, 2000);
+    }
+    
+    // Add learn button to controls
+    const controlsDiv = document.getElementById('controls');
+    const learnBtn = document.createElement('button');
+    learnBtn.id = 'btn-learn';
+    learnBtn.textContent = '🧠 Learn';
+    learnBtn.style.background = '#ffa726';
+    learnBtn.style.color = '#fff';
+    learnBtn.style.borderColor = '#ffa726';
+    learnBtn.onclick = function() {
+        if (!running) {
+            statusText.textContent = '⚠️ Start the camera first';
+            return;
+        }
+        showLearnPanel();
+    };
+    controlsDiv.appendChild(learnBtn);
+    
+    // Learn panel event listeners
+    document.getElementById('learn-yes').addEventListener('click', function() {
+        learnFromFrame(true);
+    });
+    document.getElementById('learn-no').addEventListener('click', function() {
+        learnFromFrame(false);
+    });
+    document.getElementById('learn-close').addEventListener('click', function() {
+        document.getElementById('learn-panel').style.display = 'none';
+    });
+    
+    // Override detectCar to use learned thresholds
+    const originalDetectCar = detectCar;
+    detectCar = function(imageData) {
+        const data = imageData.data;
+        const w = imageData.width;
+        const h = imageData.height;
+        const step = 8;
+        let darkPixels = 0, brightPixels = 0, redPixels = 0, bluePixels = 0, edgePixels = 0;
+        const startY = Math.floor(h * 0.4);
+        const endY = h;
+        let sampled = 0;
+        
+        const t = learnThresholds;
+        
+        for (let y = startY; y < endY; y += step) {
+            for (let x = 0; x < w; x += step) {
+                sampled++;
+                const idx = (y * w + x) * 4;
+                const r = data[idx], g = data[idx+1], b = data[idx+2];
+                const brightness = (r + g + b) / 3;
+                if (brightness < t.dark) darkPixels++;
+                if (brightness > t.bright) brightPixels++;
+                if (r > t.redR && g < t.redG && b < t.redB) redPixels++;
+                if (b > t.blueB && r < t.blueR && g < t.blueG) bluePixels++;
+                if (x + step < w && y + step < h) {
+                    const idx2 = ((y + step) * w + (x + step)) * 4;
+                    const b2 = (data[idx2] + data[idx2+1] + data[idx2+2]) / 3;
+                    if (Math.abs(brightness - b2) > 60) edgePixels++;
+                }
+            }
+        }
+        
+        if (sampled === 0) return { result: 'waiting', confidence: 0 };
+        
+        const darkRatio = darkPixels / sampled;
+        const brightRatio = brightPixels / sampled;
+        const redRatio = redPixels / sampled;
+        const blueRatio = bluePixels / sampled;
+        const edgeRatio = edgePixels / sampled;
+        
+        let score = 0;
+        if (darkRatio > 0.08) score += 25;
+        if (darkRatio > 0.15) score += 20;
+        if (darkRatio > 0.25) score += 15;
+        if (brightRatio > 0.05) score += 10;
+        if (brightRatio > 0.12) score += 15;
+        if (redRatio > 0.02) score += 20;
+        if (redRatio > 0.06) score += 15;
+        if (blueRatio > 0.02) score += 10;
+        if (edgeRatio > 0.05) score += 10;
+        if (edgeRatio > 0.12) score += 10;
+        
+        let confidence = Math.min(100, Math.round(score * 0.85));
+        if (darkRatio > 0.1 && brightRatio > 0.05) confidence += 10;
+        if (darkRatio < 0.02 && brightRatio < 0.02 && redRatio < 0.01 && blueRatio < 0.01) {
+            confidence = Math.max(0, confidence - 30);
+        }
+        if (darkRatio > 0.2) confidence += 10;
+        confidence = Math.min(100, Math.max(0, confidence));
+        
+        let result = 'waiting';
+        if (confidence > 72) result = 'unsafe';
+        else if (confidence > 25) result = 'waiting';
+        else result = 'safe';
+        
+        return { result, confidence, darkRatio, brightRatio, redRatio, edgeRatio };
+    };
+</script>
+</body>
+</html>

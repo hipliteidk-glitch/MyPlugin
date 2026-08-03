@@ -1,0 +1,172 @@
+2026-07-30 17:16:55 ===== BRIDGE START  v1.4.9  pid=10679  log=/data/data/com.termux/files/home/zs/logs/bridge_debug.log =====
+2026-07-30 17:16:55 configured 1 server(s) (0 MCP + 1 script): phone
+2026-07-30 17:16:55 listening on ws://127.0.0.1:17613  - load the extension and open a supported AI chat
+2026-07-30 17:16:56 extension connected  (127.0.0.1)  [1 client(s)]
+2026-07-30 17:16:57 ready 9 tools available - my phone connected
+2026-07-30 17:17:23 -> tool  execute_luau(code, name, datamodel_type)
+2026-07-30 17:17:24 <- execute_luau (0.3s): wrote 177 chars to /sdcard/Delta/Autoexecute/test.lua - runs when Roblox opens w
+2026-07-30 17:17:54 -> tool  write_script(path, content)
+2026-07-30 17:17:54 <- write_script (0.2s): wrote 1517 chars to /sdcard/Delta/Scripts/zeroscript_runner.lua
+2026-07-30 17:18:01 -> tool  read_file(path)
+2026-07-30 17:18:01 <- read_file (0.0s): {   "_readme": [     "Ready-to-use ZeroScript config for Termux on Android. No M
+2026-07-30 17:18:25 -> tool  execute_luau(code, name, datamodel_type)
+2026-07-30 17:18:25 <- execute_luau (0.2s): wrote 13 chars to /sdcard/Delta/Autoexecute/ping.lua - runs when Roblox opens wi
+2026-07-30 17:18:30 -> tool  write_file(path, content)
+2026-07-30 17:18:30 <- write_file (0.2s): wrote 37 chars to /sdcard/new_config.json
+2026-07-30 17:18:59 -> tool  write_file(content, path)
+2026-07-30 17:18:59 <- write_file (0.1s): wrote 4203 chars to /sdcard/potential-waddle/vendor/ZeroScript-Free/config.json
+2026-07-30 17:19:17 extension disconnected  [0 client(s)]
+2026-07-30 17:19:17 shutting down...
+2026-07-30 17:19:17 ===== BRIDGE STOP =====
+2026-07-30 17:19:21 ===== BRIDGE START  v1.4.9  pid=11071  log=/data/data/com.termux/files/home/zs/logs/bridge_debug.log =====
+2026-07-30 17:19:21 configured 1 server(s) (0 MCP + 1 script): phone
+2026-07-30 17:19:21 listening on ws://127.0.0.1:17613  - load the extension and open a supported AI chat
+2026-07-30 17:19:23 ready 9 tools available - my phone connected
+2026-07-30 17:19:23 extension connected  (127.0.0.1)  [1 client(s)]
+2026-07-30 17:20:20 -> tool  read_file(path)
+2026-07-30 17:20:20 <- read_file (0.0s): {   "_readme": [     "ZeroScript config with Delta real-time execution"   ],   "
+2026-07-30 17:20:37 -> tool  write_file(content, path)
+2026-07-30 17:20:37 <- write_file (0.1s): wrote 2760 chars to /data/data/com.termux/files/home/zs/config.json
+2026-07-30 17:20:47 extension disconnected  [0 client(s)]
+2026-07-30 17:20:47 shutting down...
+2026-07-30 17:20:47 ===== BRIDGE STOP =====
+2026-07-30 17:20:50 ===== BRIDGE START  v1.4.9  pid=11270  log=/data/data/com.termux/files/home/zs/logs/bridge_debug.log =====
+2026-07-30 17:20:50 configured 1 server(s) (0 MCP + 1 script): phone
+2026-07-30 17:20:50 listening on ws://127.0.0.1:17613  - load the extension and open a supported AI chat
+2026-07-30 17:20:52 ready 9 tools available - my phone connected
+2026-07-30 17:20:53 extension connected  (127.0.0.1)  [1 client(s)]
+2026-07-30 17:21:38 -> tool  list_files(path)
+2026-07-30 17:21:38 <- list_files (0.1s): total 10544 drwx------.  5 u0_a333 u0_a333    4096 Jul 30 17:16 . drwx------. 11
+2026-07-30 17:22:17 -> tool  write_file(content, path)
+2026-07-30 17:22:17 <- write_file (0.0s): 'write_file' failed (exit 2): /data/data/com.termux/files/usr/bin/sh: 49: Syntax
+2026-07-30 17:22:25 -> tool  write_script(content, path)
+2026-07-30 17:22:25 <- write_script (0.1s): wrote to /sdcard/Delta/Scripts/setup_other.sh
+2026-07-30 17:22:32 -> tool  write_script(content, path)
+2026-07-30 17:22:32 <- write_script (0.1s): wrote to /sdcard/Delta/Scripts/setup_other.sh
+2026-07-30 17:22:44 -> tool  write_script(content, path)
+2026-07-30 17:22:44 <- write_script (0.1s): wrote to /sdcard/Delta/Scripts/config_other.json
+2026-07-30 17:25:43 -> tool  phone_status()
+2026-07-30 17:25:43 <- phone_status (0.1s): Thu Jul 30 17:25:43 +08 2026 Filesystem     Size  Used Avail Use% Mounted on /de
+2026-07-30 17:25:49 -> tool  list_files(path)
+2026-07-30 17:25:49 <- list_files (0.0s): total 40 -rw-rw----. 1 root everybody  107 Jul 11 14:28 Enter Your Title... -rw-
+2026-07-30 17:25:56 -> tool  execute_luau(code, name, datamodel_type)
+2026-07-30 17:25:56 <- execute_luau (0.1s): wrote to /sdcard/Delta/Autoexecute/start_server.lua
+2026-07-30 17:27:01 -> tool  write_file(content, path)
+2026-07-30 17:27:01 <- write_file (0.1s): wrote to /data/data/com.termux/files/home/zs/config.json
+2026-07-30 17:27:15 extension disconnected  [0 client(s)]
+2026-07-30 17:27:15 shutting down...
+2026-07-30 17:27:15 ===== BRIDGE STOP =====
+2026-07-30 17:27:18 ===== BRIDGE START  v1.4.9  pid=12186  log=/data/data/com.termux/files/home/zs/logs/bridge_debug.log =====
+2026-07-30 17:27:18 configured 1 server(s) (0 MCP + 1 script): phone
+2026-07-30 17:27:18 listening on ws://127.0.0.1:17613  - load the extension and open a supported AI chat
+2026-07-30 17:27:18 extension connected  (127.0.0.1)  [1 client(s)]
+2026-07-30 17:27:20 ready 9 tools available - my phone connected
+2026-07-30 17:27:54 -> tool  run_luau(code)
+2026-07-30 17:27:54 <- run_luau (0.0s): sent
+2026-07-30 17:27:59 -> tool  list_files(path)
+2026-07-30 17:27:59 <- list_files (0.1s): -rw-------. 1 u0_a333 u0_a333 2104 Jul 30 17:27 /data/data/com.termux/files/home
+2026-07-30 17:28:06 -> tool  read_file(path)
+2026-07-30 17:28:06 <- read_file (0.0s): {"target":{"id":"phone","kind":"generic","name":"my phone","short":"Phone"},"ser
+2026-07-30 17:28:32 -> tool  write_file(content, path)
+2026-07-30 17:28:32 <- write_file (0.1s): 'write_file' failed (exit 2): /data/data/com.termux/files/usr/bin/sh: 2: target:
+2026-07-30 17:28:48 -> tool  write_script(content, path)
+2026-07-30 17:28:48 <- write_script (0.1s): 'write_script' failed (exit 2): /data/data/com.termux/files/usr/bin/sh: 67: Synt
+2026-07-30 17:28:57 -> tool  execute_luau(code, name, datamodel_type)
+2026-07-30 17:28:57 <- execute_luau (0.0s): wrote
+2026-07-30 17:29:04 -> tool  read_file(path)
+2026-07-30 17:29:04 <- read_file (0.0s): {"target":{"id":"phone","kind":"generic","name":"my phone","short":"Phone"},"ser
+2026-07-30 17:29:11 -> tool  execute_luau(code, name, datamodel_type)
+2026-07-30 17:29:11 <- execute_luau (0.0s): wrote
+2026-07-30 17:29:27 extension disconnected  [0 client(s)]
+2026-07-30 17:29:27 shutting down...
+2026-07-30 17:29:27 ===== BRIDGE STOP =====
+2026-07-30 17:29:31 ===== BRIDGE START  v1.4.9  pid=12564  log=/data/data/com.termux/files/home/zs/logs/bridge_debug.log =====
+2026-07-30 17:29:31 configured 1 server(s) (0 MCP + 1 script): phone
+2026-07-30 17:29:31 listening on ws://127.0.0.1:17613  - load the extension and open a supported AI chat
+2026-07-30 17:29:32 ready 7 tools available - my phone connected
+2026-07-30 17:29:33 extension connected  (127.0.0.1)  [1 client(s)]
+2026-07-30 17:29:56 -> tool  write_file(content, path)
+2026-07-30 17:29:56 <- write_file (0.2s): wrote 1309 chars to /sdcard/build_config.py
+2026-07-30 17:30:05 -> tool  write_file(content, path)
+2026-07-30 17:30:05 <- write_file (0.2s): wrote 127 chars to /sdcard/delta_send.py
+2026-07-30 17:30:18 extension disconnected  [0 client(s)]
+2026-07-30 17:30:18 shutting down...
+2026-07-30 17:30:18 ===== BRIDGE STOP =====
+2026-07-30 17:30:21 ===== BRIDGE START  v1.4.9  pid=12900  log=/data/data/com.termux/files/home/zs/logs/bridge_debug.log =====
+2026-07-30 17:30:21 configured 1 server(s) (0 MCP + 1 script): phone
+2026-07-30 17:30:21 listening on ws://127.0.0.1:17613  - load the extension and open a supported AI chat
+2026-07-30 17:30:23 ready 9 tools available - my phone connected
+2026-07-30 17:30:23 extension connected  (127.0.0.1)  [1 client(s)]
+2026-07-30 17:31:13 -> tool  write_file(content, path)
+2026-07-30 17:31:13 <- write_file (0.2s): wrote 3260 chars to /sdcard/config_phone2.json
+2026-07-30 17:31:21 -> tool  write_file(content, path)
+2026-07-30 17:31:21 <- write_file (0.2s): wrote 127 chars to /sdcard/delta_send_phone2.py
+2026-07-30 17:31:32 -> tool  write_file(content, path)
+2026-07-30 17:31:33 <- write_file (0.2s): wrote 1287 chars to /sdcard/runner_phone2.lua
+2026-07-30 17:32:30 -> tool  write_file(content, path)
+2026-07-30 17:32:30 <- write_file (0.2s): wrote 623 chars to /sdcard/fileserver.py
+2026-07-30 17:36:53 extension disconnected  [0 client(s)]
+2026-07-30 17:40:47 extension connected  (127.0.0.1)  [1 client(s)]
+2026-07-30 17:47:21 -> tool  write_file(content, path)
+2026-07-30 17:47:22 <- write_file (0.4s): wrote 1585 chars to /sdcard/add_phone2.py
+2026-07-30 17:47:30 -> tool  run_luau(code)
+2026-07-30 17:47:31 <- run_luau (0.1s): sent
+2026-07-30 17:48:54 -> tool  write_file(content, path)
+2026-07-30 17:48:55 <- write_file (0.2s): wrote 1243 chars to /sdcard/restore_bridge.py
+2026-07-30 17:53:40 -> tool  write_file(content, path)
+2026-07-30 17:53:40 <- write_file (0.2s): wrote 553 chars to /sdcard/phone2_send.py
+2026-07-30 17:53:51 -> tool  write_file(content, path)
+2026-07-30 17:53:51 <- write_file (0.1s): wrote 1430 chars to /sdcard/add_phone2_v2.py
+2026-07-30 18:05:59 extension disconnected  [0 client(s)]
+2026-07-30 18:37:53 extension connected  (127.0.0.1)  [1 client(s)]
+2026-07-30 18:38:59 -> tool  write_file(content, path)
+2026-07-30 18:38:59 <- write_file (0.5s): wrote 1258 chars to /sdcard/Delta/Scripts/zeroscript_poll.lua
+2026-07-30 20:50:44 extension disconnected  [0 client(s)]
+2026-07-30 20:51:57 extension connected  (127.0.0.1)  [1 client(s)]
+2026-07-30 20:55:47 extension disconnected  [0 client(s)]
+2026-07-30 20:57:11 extension connected  (127.0.0.1)  [1 client(s)]
+2026-07-30 20:58:06 -> tool  write_file(path, content)
+2026-07-30 20:58:07 <- write_file (0.4s): wrote 1740 chars to http_cmd.py
+2026-07-30 20:58:11 -> tool  run_luau(code)
+2026-07-30 20:58:11 <- run_luau (0.2s): sent
+2026-07-30 20:58:14 -> tool  read_result()
+2026-07-30 20:58:14 <- read_result (0.1s): 'read_result' failed (exit 1): cat: /sdcard/Delta/Scripts/zeroscript_result.txt:
+2026-07-30 20:58:18 -> tool  write_file(path, content)
+2026-07-30 20:58:19 <- write_file (0.1s): wrote 47 chars to run_http_test.sh
+2026-07-30 20:58:22 -> tool  list_files(path)
+2026-07-30 20:58:23 <- list_files (0.0s): 'list_files' failed (exit 2): ls: cannot access 'Delta/Scripts': No such file or
+2026-07-30 20:58:26 -> tool  list_files(path)
+2026-07-30 20:58:26 <- list_files (0.1s): total 10564 drwx------.  5 u0_a333 u0_a333    4096 Jul 30 20:58 . drwx------. 11
+2026-07-30 20:58:30 -> tool  list_files(path)
+2026-07-30 20:58:30 <- list_files (0.0s): lrw-r--r--. 1 root root 21 Oct  8  2021 /sdcard -> /storage/self/primary
+2026-07-30 20:58:34 -> tool  list_files(path)
+2026-07-30 20:58:34 <- list_files (0.0s): lrwxrwxrwx. 1 root root 19 Jul 30 10:41 /storage/self/primary -> /storage/emulat
+2026-07-30 20:58:38 -> tool  list_files(path)
+2026-07-30 20:58:38 <- list_files (0.1s): total 18948 drwxrwx---. 3 root everybody     4096 Jul  5 17:32 .$Trash$ drwxrwx-
+2026-07-30 20:58:41 -> tool  list_files(path)
+2026-07-30 20:58:41 <- list_files (0.1s): total 56 -rw-rw----. 1 root everybody  107 Jul 11 14:28 Enter Your Title... -rw-
+2026-07-30 20:58:45 -> tool  read_file(path)
+2026-07-30 20:58:45 <- read_file (0.1s): local url = 'http://192.168.50.50:18081/cmd'; local success, response = pcall(fu
+2026-07-30 20:58:49 -> tool  list_files(path)
+2026-07-30 20:58:49 <- list_files (0.0s): total 56 -rw-rw----. 1 root everybody  107 Jul 11 14:28 Enter Your Title... -rw-
+2026-07-30 20:58:53 -> tool  read_file(path)
+2026-07-30 20:58:53 <- read_file (0.0s): local HttpService = game:GetService("HttpService") local Players = game:GetServi
+2026-07-30 20:59:22 -> tool  write_file(path, content)
+2026-07-30 20:59:22 <- write_file (0.2s): wrote 2796 chars to /storage/emulated/0/serve_commands.py
+2026-07-30 20:59:26 -> tool  write_file(path, content)
+2026-07-30 20:59:26 <- write_file (0.1s): wrote 157 chars to /storage/emulated/0/start_server.sh
+2026-07-30 20:59:30 -> tool  run_luau(code)
+2026-07-30 20:59:30 <- run_luau (0.1s): sent
+2026-07-30 20:59:34 -> tool  read_file(path)
+2026-07-30 20:59:34 <- read_file (0.0s): 'read_file' failed (exit 1): cat: /storage/emulated/0/server_log.txt: No such fi
+2026-07-30 21:01:01 extension disconnected  [0 client(s)]
+2026-07-30 21:02:57 extension connected  (127.0.0.1)  [1 client(s)]
+2026-07-30 21:06:16 -> tool  read_file(path)
+2026-07-30 21:06:16 <- read_file (0.2s): os.execute('sh /storage/emulated/0/start_server.sh')
+2026-07-30 21:06:21 -> tool  write_file(path, content)
+2026-07-30 21:06:21 <- write_file (0.4s): wrote 31 chars to /storage/emulated/0/Delta/Scripts/zeroscript_cmd.lua
+2026-07-30 21:07:03 -> tool  write_file(path, content)
+2026-07-30 21:07:03 <- write_file (0.2s): wrote 66 chars to /storage/emulated/0/test_curl.sh
+2026-07-30 21:07:08 -> tool  write_file(path, content)
+2026-07-30 21:07:08 <- write_file (0.1s): wrote 37 chars to /storage/emulated/0/Delta/Scripts/zeroscript_result.txt
+2026-07-30 21:08:07 extension disconnected  [0 client(s)]

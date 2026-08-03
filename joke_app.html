@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>did you use cheats?</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #007AFF;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            touch-action: none;
+        }
+        .container {
+            background: white;
+            border-radius: 30px;
+            padding: 40px 30px 50px;
+            width: 90%;
+            max-width: 380px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            position: relative;
+        }
+        h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1c1c1e;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            font-size: 14px;
+            color: #8e8e93;
+            margin-bottom: 30px;
+        }
+        .tweet-box {
+            background: #f5f5f7;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 30px;
+            text-align: left;
+            font-size: 14px;
+            border: 1px solid #e5e5ea;
+            position: relative;
+        }
+        .tweet-box .handle {
+            font-weight: 600;
+            color: #1c1c1e;
+        }
+        .tweet-box .handle span {
+            color: #8e8e93;
+            font-weight: 400;
+        }
+        .tweet-box .comment {
+            margin-top: 6px;
+            color: #1c1c1e;
+            line-height: 1.4;
+        }
+        .tweet-box .comment .highlight {
+            background: #ffd60a;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        .tweet-box .reply {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #e5e5ea;
+            color: #007AFF;
+            font-weight: 500;
+        }
+        .tweet-box .reply span {
+            color: #1c1c1e;
+            font-weight: 400;
+        }
+        .buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .btn {
+            padding: 14px 40px;
+            border: none;
+            border-radius: 14px;
+            font-size: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            touch-action: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            position: relative;
+        }
+        .btn-yes {
+            background: #34c759;
+            color: white;
+            box-shadow: 0 4px 0 #2e9b4a;
+        }
+        .btn-yes:active {
+            transform: scale(0.95);
+        }
+        .btn-no {
+            background: #ff3b30;
+            color: white;
+            box-shadow: 0 4px 0 #c92c24;
+        }
+        .btn-no:active {
+            transform: scale(0.95);
+        }
+        .btn-no.fleeing {
+            transition: all 0.08s ease;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .trap-message {
+            margin-top: 20px;
+            padding: 14px;
+            background: #ffd60a;
+            border-radius: 12px;
+            font-weight: 600;
+            color: #1c1c1e;
+            animation: pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes pop {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .trap-message .emoji {
+            font-size: 28px;
+            display: block;
+            margin-bottom: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="app">
+        <h1>did you use cheats?</h1>
+        <p class="subtitle">be honest...</p>
+
+        <div class="tweet-box">
+            <div class="handle">scary_poop <span>@scary_poop · 2h</span></div>
+            <div class="comment">Y- YOU USE <span class="highlight">C-CHEAT!?</span></div>
+            <div class="reply">bitetheapple <span>· you're getting a whole ios app</span></div>
+        </div>
+
+        <div class="buttons">
+            <button class="btn btn-yes" id="btnYes">yes</button>
+            <button class="btn btn-no" id="btnNo">no</button>
+        </div>
+
+        <div id="trapMessage" class="trap-message hidden">
+            <span class="emoji">🤡</span>
+            YOU CAN'T ESCAPE THE TRUTH.<br>
+            <span style="font-size:12px;font-weight:400;">(scary_poop knows everything)</span>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const btnYes = document.getElementById('btnYes');
+            const btnNo = document.getElementById('btnNo');
+            const trapMessage = document.getElementById('trapMessage');
+            const container = document.querySelector('.container');
+
+            let fleeCount = 0;
+            const maxFlee = 20;
+            let isFleeing = false;
+
+            function getRandomPosition() {
+                const containerRect = container.getBoundingClientRect();
+                const btnRect = btnNo.getBoundingClientRect();
+                
+                const padding = 10;
+                const maxX = containerRect.width - btnRect.width - padding;
+                const maxY = containerRect.height - btnRect.height - padding;
+                
+                // Keep it within the container but allow some overlap for humor
+                const x = Math.random() * maxX;
+                const y = Math.random() * maxY;
+                
+                return { x, y };
+            }
+
+            function fleeButton() {
+                if (isFleeing) return;
+                isFleeing = true;
+                
+                const pos = getRandomPosition();
+                btnNo.style.position = 'absolute';
+                btnNo.style.left = pos.x + 'px';
+                btnNo.style.top = pos.y + 'px';
+                btnNo.style.transform = 'scale(0.9)';
+                btnNo.classList.add('fleeing');
+                
+                fleeCount++;
+                
+                setTimeout(() => {
+                    btnNo.style.transform = 'scale(1)';
+                    isFleeing = false;
+                }, 100);
+
+                if (fleeCount >= maxFlee) {
+                    triggerTrap();
+                }
+            }
+
+            function triggerTrap() {
+                trapMessage.classList.remove('hidden');
+                btnYes.disabled = true;
+                btnNo.disabled = true;
+                btnYes.style.opacity = '0.5';
+                btnNo.style.opacity = '0.5';
+                btnNo.style.position = 'static';
+                btnNo.style.left = 'auto';
+                btnNo.style.top = 'auto';
+                btnNo.style.transform = 'scale(1)';
+                btnNo.classList.remove('fleeing');
+                
+                // Flash the trap
+                trapMessage.style.animation = 'none';
+                setTimeout(() => {
+                    trapMessage.style.animation = 'pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                }, 10);
+            }
+
+            // Yes button - triggers the trap directly (the joke)
+            btnYes.addEventListener('click', function(e) {
+                e.preventDefault();
+                triggerTrap();
+            });
+
+            // No button - flees, then traps after many attempts
+            btnNo.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (!trapMessage.classList.contains('hidden')) return;
+                fleeButton();
+            });
+
+            // Also flee on hover/touch move for mobile
+            btnNo.addEventListener('touchstart', function(e) {
+                if (!trapMessage.classList.contains('hidden')) return;
+                // Don't flee immediately on touch start, wait for actual click
+            });
+
+            // Additional trap: if user somehow manages to click no without fleeing (rare)
+            btnNo.addEventListener('touchend', function(e) {
+                if (!trapMessage.classList.contains('hidden')) return;
+                // The click handler already handles it
+            });
+
+            // Reset button positions on resize
+            window.addEventListener('resize', function() {
+                if (!trapMessage.classList.contains('hidden')) return;
+                btnNo.style.position = 'static';
+                btnNo.style.left = 'auto';
+                btnNo.style.top = 'auto';
+                btnNo.style.transform = 'scale(1)';
+            });
+
+            console.log('🤡 Joke app loaded - try pressing "yes" or chase "no"!');
+        })();
+    </script>
+</body>
+</html>
