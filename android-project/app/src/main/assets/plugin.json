@@ -1,0 +1,7 @@
+{
+  "name": "TapPlugin",
+  "description": "Perform screen taps via intents",
+  "version": "1.0.0",
+  "authors": ["hipliteidk-glitch"],
+  "main": "com.example.android.architecture.blueprints.todoapp.TapPlugin"
+}

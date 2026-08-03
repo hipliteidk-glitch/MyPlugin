@@ -195,4 +195,23 @@ dependencies {
     // AndroidX Test - Hilt testing
     androidTestImplementation(libs.hilt.android.testing)
     kspAndroidTest(libs.hilt.compiler)
+
+    // Aliucord SDK - added for plugin support
+    implementation("com.github.Aliucord:Aliucord:main-SNAPSHOT")
+}
+
+// Task to create plugin ZIP
+tasks.register<Zip>("createPluginZip") {
+    from("build/intermediates/aar_main_jar/debug/classes.jar") {
+        into("classes")
+    }
+    from("src/main/assets/plugin.json") {
+        into("")
+    }
+    archiveFileName.set("plugin.zip")
+    destinationDirectory.set(file("build/outputs/zip"))
+}
+
+tasks.named("assembleDebug").configure {
+    finalizedBy("createPluginZip")
 }

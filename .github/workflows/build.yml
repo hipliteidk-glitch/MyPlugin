@@ -44,7 +44,7 @@ jobs:
       run: |
         cd android-project
         chmod +x gradlew
-        ./gradlew assemble --no-daemon
+        ./gradlew assembleDebug createPluginZip --no-daemon
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
@@ -56,4 +56,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: plugin-zip
-        path: android-project/build/outputs/zip/*
+        path: android-project/app/build/outputs/zip/*
