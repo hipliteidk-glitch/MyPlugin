@@ -44,7 +44,7 @@ jobs:
       run: |
         cd android-project
         chmod +x gradlew
-        ./gradlew assembleDebug createPluginZip --no-daemon
+        ./gradlew createPluginZip --no-daemon
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
