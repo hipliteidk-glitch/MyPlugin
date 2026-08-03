@@ -7,11 +7,28 @@ import android.os.Build;
 import android.view.accessibility.AccessibilityEvent;
 
 public class TapService extends AccessibilityService {
+    private static TapService instance;
+
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {}
 
     @Override
     public void onInterrupt() {}
+
+    @Override
+    public void onServiceConnected() {
+        instance = this;
+    }
+
+    @Override
+    public void onDestroy() {
+        instance = null;
+        super.onDestroy();
+    }
+
+    public static TapService getInstance() {
+        return instance;
+    }
 
     public void performTap(int x, int y) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
