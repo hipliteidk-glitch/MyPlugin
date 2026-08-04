@@ -208,6 +208,6 @@ tasks.register<Zip>("createPluginZip") {
     destinationDirectory.set(file("build/outputs/zip"))
 }
 
-tasks.named("assembleDebug").configure {
+tasks.named("assemble").configure {
     finalizedBy("createPluginZip")
 }
