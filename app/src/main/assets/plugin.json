@@ -1,0 +1,7 @@
+{
+  "name": "MyPlugin",
+  "description": "My Aliucord plugin",
+  "version": "1.0.0",
+  "authors": ["hipliteidk-glitch"],
+  "main": "com.myplugin.MyPlugin"
+}
