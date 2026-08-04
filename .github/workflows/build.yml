@@ -35,4 +35,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: plugin-zip
-        path: app/build/outputs/aliucord/*.zip
+        path: app/build/outputs/*.zip
