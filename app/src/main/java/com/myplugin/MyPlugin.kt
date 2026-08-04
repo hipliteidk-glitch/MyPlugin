@@ -15,18 +15,16 @@ class MyPlugin : Plugin() {
             patcher.after(
                 "com.discord.stores.StoreMessages",
                 "deleteMessage"
-            ) { param ->
-                val message = param.args[0]
-                Utils.log("📝 Deleted message: $message")
+            ) {
+                Utils.log("📝 Message deleted")
             }
 
             // Log edited messages
             patcher.after(
                 "com.discord.stores.StoreMessages",
                 "editMessage"
-            ) { param ->
-                val message = param.args[0]
-                Utils.log("✏️ Edited message: $message")
+            ) {
+                Utils.log("✏️ Message edited")
             }
 
             Utils.showToast("MyPlugin started!")
