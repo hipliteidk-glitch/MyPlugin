@@ -32,6 +32,7 @@ android {
 }
 
 configure<AliucordExtension> {
+    name = "MyPlugin"
     author("hipliteidk", 0L, hyperlink = false)
     github("https://github.com/hipliteidk-glitch/MyPlugin")
 }
