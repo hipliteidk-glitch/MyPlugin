@@ -3,42 +3,21 @@ package com.myplugin
 import android.content.Context
 import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
+import com.aliucord.api.CommandsAPI
 import com.aliucord.entities.Plugin
-import com.aliucord.patcher.*
 
 @AliucordPlugin(requiresRestart = false)
 @Suppress("unused")
 class MyPlugin : Plugin() {
     override fun start(context: Context) {
-        try {
-            // Log deleted messages
-            patcher.after(
-                "com.discord.stores.StoreMessages",
-                "deleteMessage"
-            ) {
-                Utils.log("📝 Message deleted")
-            }
-
-            // Log edited messages
-            patcher.after(
-                "com.discord.stores.StoreMessages",
-                "editMessage"
-            ) {
-                Utils.log("✏️ Message edited")
-            }
-
-            Utils.showToast("MyPlugin started!")
-        } catch (e: Exception) {
-            Utils.log("❌ Plugin error: ${e.message}")
+        commands.registerCommand("ping", "Test command from MyPlugin") {
+            CommandsAPI.CommandResult("Pong! MyPlugin is working!")
         }
+
+        Utils.showToast("MyPlugin started!")
     }
 
     override fun stop(context: Context) {
-        try {
-            patcher.unpatchAll()
-            Utils.showToast("MyPlugin stopped!")
-        } catch (e: Exception) {
-            Utils.log("❌ Stop error: ${e.message}")
-        }
+        // Cleanup handled automatically by Aliucord
     }
 }
