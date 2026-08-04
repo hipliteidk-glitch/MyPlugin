@@ -42,18 +42,11 @@ jobs:
 
     - name: Build Plugin
       run: |
-        cd android-project
         chmod +x gradlew
-        ./gradlew createPluginZip --no-daemon
-
-    - name: Upload APK
-      uses: actions/upload-artifact@v4
-      with:
-        name: plugin-apk
-        path: android-project/app/build/outputs/apk/*
+        ./gradlew :app:assemble --no-daemon
 
     - name: Upload ZIP
       uses: actions/upload-artifact@v4
       with:
         name: plugin-zip
-        path: android-project/app/build/outputs/zip/*
+        path: app/build/outputs/aar/*
