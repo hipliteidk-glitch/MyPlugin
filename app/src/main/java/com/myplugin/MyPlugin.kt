@@ -1,32 +1,33 @@
 package com.myplugin
 
+import android.content.Context
+import com.aliucord.Utils
+import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
-import com.aliucord.api.PatcherAPI
-import com.aliucord.api.API
-import com.aliucord.utils.Utils
+import com.aliucord.patcher.*
 
+@AliucordPlugin(requiresRestart = false)
+@Suppress("unused")
 class MyPlugin : Plugin() {
-    override fun start() {
+    override fun start(context: Context) {
         try {
             // Log deleted messages
-            PatcherAPI.patch(
+            patcher.after(
                 "com.discord.stores.StoreMessages",
-                "deleteMessage",
-                { args ->
-                    val message = args[0]
-                    Utils.log("📝 Deleted message: $message")
-                }
-            )
+                "deleteMessage"
+            ) { param ->
+                val message = param.args[0]
+                Utils.log("📝 Deleted message: $message")
+            }
 
             // Log edited messages
-            PatcherAPI.patch(
+            patcher.after(
                 "com.discord.stores.StoreMessages",
-                "editMessage",
-                { args ->
-                    val message = args[0]
-                    Utils.log("✏️ Edited message: $message")
-                }
-            )
+                "editMessage"
+            ) { param ->
+                val message = param.args[0]
+                Utils.log("✏️ Edited message: $message")
+            }
 
             Utils.showToast("MyPlugin started!")
         } catch (e: Exception) {
@@ -34,9 +35,9 @@ class MyPlugin : Plugin() {
         }
     }
 
-    override fun stop() {
+    override fun stop(context: Context) {
         try {
-            PatcherAPI.unpatchAll()
+            patcher.unpatchAll()
             Utils.showToast("MyPlugin stopped!")
         } catch (e: Exception) {
             Utils.log("❌ Stop error: ${e.message}")
