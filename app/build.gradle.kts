@@ -10,6 +10,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
 }
 
+version = "1.0.0"
+
 android {
     namespace = "com.myplugin"
     compileSdk = 36
