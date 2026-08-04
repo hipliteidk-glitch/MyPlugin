@@ -1,17 +1,27 @@
+@file:Suppress("UnstableApiUsage")
+
 pluginManagement {
     repositories {
         google()
-        mavenCentral()
         gradlePluginPortal()
+        maven {
+            name = "aliucord"
+            url = uri("https://maven.aliucord.com/releases")
+        }
     }
 }
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
-        maven("https://maven.aliucord.com/snapshots")
+        maven {
+            name = "aliucord"
+            url = uri("https://maven.aliucord.com/releases")
+        }
     }
 }
+
 rootProject.name = "MyPlugin"
 include(":app")

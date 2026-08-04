@@ -25,28 +25,14 @@ jobs:
       run: |
         echo "ANDROID_HOME=/usr/local/lib/android/sdk" >> $GITHUB_ENV
         echo "ANDROID_SDK_ROOT=/usr/local/lib/android/sdk" >> $GITHUB_ENV
-        echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
-        echo "$ANDROID_HOME/tools/bin" >> $GITHUB_PATH
-
-    - name: Checkout Aliucord
-      run: |
-        git clone --depth 1 https://github.com/Aliucord/Aliucord.git ../Aliucord
-        cd ../Aliucord
-        git checkout main
-
-    - name: Build Aliucord SDK
-      run: |
-        cd ../Aliucord
-        chmod +x gradlew
-        ./gradlew :Aliucord:assemble -x test --no-daemon
 
     - name: Build Plugin
       run: |
         chmod +x gradlew
-        ./gradlew :app:assemble --no-daemon
+        ./gradlew :app:make --no-daemon
 
-    - name: Upload AAR
+    - name: Upload Plugin Zip
       uses: actions/upload-artifact@v4
       with:
-        name: plugin-aar
-        path: app/build/outputs/aar/*
+        name: plugin-zip
+        path: app/build/outputs/aliucord/*.zip
