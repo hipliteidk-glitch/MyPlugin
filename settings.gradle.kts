@@ -24,4 +24,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "MyPlugin"
-include(":app")
+include(":MyPlugin")

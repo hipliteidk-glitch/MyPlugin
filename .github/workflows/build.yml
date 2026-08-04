@@ -29,10 +29,10 @@ jobs:
     - name: Build Plugin
       run: |
         chmod +x gradlew
-        ./gradlew :app:make --no-daemon
+        ./gradlew :MyPlugin:make --no-daemon
 
     - name: Upload Plugin Zip
       uses: actions/upload-artifact@v4
       with:
         name: plugin-zip
-        path: app/build/outputs/*.zip
+        path: MyPlugin/build/outputs/*.zip
