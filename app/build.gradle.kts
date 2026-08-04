@@ -22,5 +22,5 @@ android {
 }
 
 dependencies {
-    compileOnly("com.aliucord:Aliucord:1.0.0")
+    compileOnly(files("${rootProject.projectDir}/../Aliucord/Aliucord/build/outputs/aar/Aliucord-release.aar"))
 }
